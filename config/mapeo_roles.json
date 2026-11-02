@@ -1,0 +1,64 @@
+{
+  "descripcion": "Rol del template (pestaña COSTOS X HORAS FACTURABLES, columnas A y B) -> categoría de una fuente de sources.json. modo 'auto': se aplica solo si pasa las validaciones. modo 'revision': siempre queda pendiente hasta que alguien lo apruebe en la pestaña Fuentes_Tarifas. 'categoria' admite una lista de alternativas (p. ej. errores de tipeo de la fuente). 'factor' multiplica el valor de la fuente.",
+  "roles": [
+    {"area": "Dirección General", "rol": "CEO", "fuente": "sica_animacion_2d", "categoria": "Coordinador/a de Producción", "unidad": "diario", "factor": 1.4, "modo": "auto", "nota": "Regla de la plantilla: Coordinador/a de Producción x 1,4"},
+    {"area": "Dirección General", "rol": "Dir General", "fuente": "sica_animacion_2d", "categoria": "Coordinador/a de Producción", "unidad": "diario", "factor": 1.4, "modo": "auto", "nota": "Regla de la plantilla: Coordinador/a de Producción x 1,4"},
+
+    {"area": "Producción", "rol": "Coordinadora de producción", "fuente": "sica_animacion_2d", "categoria": "Coordinador/a de Producción", "unidad": "diario", "modo": "auto"},
+    {"area": "Producción", "rol": "Productora de Área", "fuente": "sica_animacion_3d", "categoria": "Productor/a de Área", "unidad": "diario", "modo": "revision", "nota": "El valor actual de la plantilla es mayor que la escala SICA 3D: confirmar la fuente correcta"},
+    {"area": "Producción", "rol": "Asist. de producción", "fuente": "sica_animacion_2d", "categoria": "Asistente de Producción", "unidad": "diario", "modo": "auto"},
+
+    {"area": "Animación 2D", "rol": "Director/a de arte 2D", "fuente": "sica_animacion_2d", "categoria": "Director/a de Arte", "unidad": "diario", "modo": "auto"},
+    {"area": "Animación 2D", "rol": "Director/a de animación", "fuente": "sica_animacion_2d", "categoria": "Director/a de Animación", "unidad": "diario", "modo": "auto"},
+    {"area": "Animación 2D", "rol": "Supervisor/a Asistencia", "fuente": "sica_animacion_2d", "categoria": "Supervisor/a Asistencia", "unidad": "diario", "modo": "auto"},
+    {"area": "Animación 2D", "rol": "Arte conceptual", "fuente": "sica_animacion_2d", "categoria": "Arte Conceptual", "unidad": "diario", "modo": "auto"},
+    {"area": "Animación 2D", "rol": "Diseñador/a de personajes", "fuente": "sica_animacion_2d", "categoria": "Diseñador/a de Personajes", "unidad": "diario", "modo": "auto"},
+    {"area": "Animación 2D", "rol": "Animador/a Cutout", "fuente": "sica_animacion_2d", "categoria": "Animador/a Cutout", "unidad": "diario", "modo": "auto"},
+    {"area": "Animación 2D", "rol": "Ilustrador/a", "fuente": "sup_agencias", "area_fuente": "ÁREA CREATIVA", "categoria": "DIBUJANTE ILUSTRADOR", "unidad": "mensual", "modo": "auto", "nota": "La plantilla ya usaba SUP (mensual / 21)"},
+    {"area": "Animación 2D", "rol": "Asistente", "fuente": "sica_animacion_2d", "categoria": "Asistente", "unidad": "diario", "modo": "auto"},
+    {"area": "Animación 2D", "rol": "Clean Up / Color", "fuente": "sica_animacion_2d", "categoria": "Clean up / Color", "unidad": "diario", "modo": "auto"},
+    {"area": "Animación 2D", "rol": "Stotyboard", "fuente": "sica_animacion_2d", "categoria": "Storyboard", "unidad": "diario", "modo": "auto"},
+    {"area": "Animación 2D", "rol": "2D Layout", "fuente": "sica_animacion_2d", "categoria": "Layout", "unidad": "diario", "modo": "auto"},
+    {"area": "Animación 2D", "rol": "Fondista", "fuente": "sica_animacion_2d", "categoria": "Fondista", "unidad": "diario", "modo": "auto"},
+    {"area": "Animación 2D", "rol": "Rigging", "fuente": "sica_animacion_3d", "categoria": "Técnico/a Rigging & Settings", "unidad": "diario", "modo": "auto", "nota": "SICA 2D no tiene Rigging; la plantilla usa el valor de 3D"},
+
+    {"area": "Animación 3D", "rol": "Director/a de Área", "fuente": "sica_animacion_3d", "categoria": "Director/a de Área", "unidad": "diario", "modo": "auto"},
+    {"area": "Animación 3D", "rol": "Supervisor/a", "fuente": "sica_animacion_3d", "categoria": ["Supervisor/a", "Suervisor/a"], "unidad": "diario", "modo": "auto", "nota": "El PDF de SICA escribe 'Suervisor/a'"},
+    {"area": "Animación 3D", "rol": "3D Layout", "fuente": "sica_animacion_3d", "categoria": "Layout", "unidad": "diario", "modo": "auto"},
+    {"area": "Animación 3D", "rol": "Op. Sistemas", "fuente": "sica_animacion_3d", "categoria": "Operador/a Sistemas", "unidad": "diario", "modo": "auto"},
+    {"area": "Animación 3D", "rol": "Fixing y Asistencia", "fuente": "sica_animacion_3d", "categoria": "Fixing y Asistencia", "unidad": "diario", "modo": "auto"},
+    {"area": "Animación 3D", "rol": "Generalista", "fuente": "sica_animacion_3d", "categoria": "Generalista", "unidad": "diario", "modo": "auto"},
+    {"area": "Animación 3D", "rol": "Técnico/a de rigging & settings", "fuente": "sica_animacion_3d", "categoria": "Técnico/a Rigging & Settings", "unidad": "diario", "modo": "auto"},
+    {"area": "Animación 3D", "rol": "Modelador/a personajes 3D", "fuente": "sica_animacion_3d", "categoria": "Modelador/a 3D", "unidad": "diario", "modo": "auto"},
+    {"area": "Animación 3D", "rol": "Animador/a", "fuente": "sica_animacion_3d", "categoria": "Animador/a", "unidad": "diario", "modo": "auto"},
+    {"area": "Animación 3D", "rol": "Aprendiz 3D", "fuente": "sica_animacion_3d", "categoria": "Aprendiz 3D", "unidad": "diario", "modo": "auto"},
+    {"area": "Animación 3D", "rol": "Operador/a de iluminación", "fuente": "sica_animacion_3d", "categoria": "Operador/a Iluminación", "unidad": "diario", "modo": "auto"},
+    {"area": "Animación 3D", "rol": "Técnico/a Simulación y FX", "fuente": "sica_animacion_3d", "categoria": "Técnico/a Simulación y FX", "unidad": "diario", "modo": "auto"},
+    {"area": "Animación 3D", "rol": "Tec Shaders y texturas", "fuente": "sica_animacion_3d", "categoria": "Técnico/a Shaders y Texturas", "unidad": "diario", "modo": "auto"},
+    {"area": "Animación 3D", "rol": "Tec. Desarrollo y programación", "fuente": "sica_animacion_3d", "categoria": "Técnico/a Desarrollo y Programación", "unidad": "diario", "modo": "auto"},
+    {"area": "Animación 3D", "rol": "Tec. Artist", "fuente": "sica_animacion_3d", "categoria": "Técnico/a Rigging & Settings", "unidad": "diario", "modo": "revision", "nota": "SICA no tiene Technical Artist; la plantilla lo equipara a Rigging"},
+    {"area": "Animación 3D", "rol": "Modelador/a entornos", "fuente": "sica_animacion_3d", "categoria": "Modelador/a 3D", "unidad": "diario", "modo": "auto"},
+
+    {"area": "Composición", "rol": "Dir. FX y Compo", "fuente": "sica_animacion_2d", "categoria": "Director/a de FX y Compo", "unidad": "diario", "modo": "auto"},
+    {"area": "Composición", "rol": "Op. de Composición senior", "fuente": "sica_animacion_2d", "categoria": "Operador/a Composición Senior", "unidad": "diario", "modo": "auto"},
+    {"area": "Composición", "rol": "Compositor 360", "fuente": "sica_animacion_2d", "categoria": "Operador/a Composición Senior", "unidad": "diario", "modo": "revision", "nota": "Rol 360 equiparado a Operador/a Composición Senior"},
+
+    {"area": "Motion Graphics", "rol": "Dir. de Motion Graphics", "fuente": "sica_animacion_2d", "categoria": "Director/a de Motion Graphics", "unidad": "diario", "modo": "auto"},
+    {"area": "Motion Graphics", "rol": "Animador/a Motion Graphics", "fuente": "sica_animacion_2d", "categoria": "Animador/a Motion Graphics", "unidad": "diario", "modo": "auto"},
+    {"area": "Motion Graphics", "rol": "Motion 360", "fuente": "sica_animacion_2d", "categoria": "Animador/a Motion Graphics", "unidad": "diario", "modo": "revision", "nota": "Rol 360 equiparado a Animador/a Motion Graphics"},
+
+    {"area": "Edición y Post", "rol": "Dir. de Postproducción", "fuente": "sica_animacion_2d", "categoria": "Director/a de Postproducción", "unidad": "diario", "modo": "auto"},
+
+    {"area": "Sonido", "rol": "Sup. Sonido", "fuente": "sica_animacion_2d", "categoria": "Supervisor/a Sonido", "unidad": "diario", "modo": "revision", "nota": "El valor actual de la plantilla no coincide con la escala de animación: confirmar la fuente"},
+
+    {"area": "Creatividad", "rol": "Dir. Creativo", "fuente": "sup_agencias", "area_fuente": "ÁREA CREATIVA", "categoria": "DIRECTOR CREATIVO", "unidad": "mensual", "modo": "auto"},
+    {"area": "Creatividad", "rol": "Redactor/a Creativo", "fuente": "sup_agencias", "area_fuente": "ÁREA CREATIVA", "categoria": "REDACTOR SENIOR", "unidad": "mensual", "modo": "auto"},
+    {"area": "Creatividad", "rol": "Diseñador/a", "fuente": "sup_agencias", "area_fuente": "ÁREA DE PRODUCCIÓN GRÁFICA", "categoria": "JEFE", "unidad": "mensual", "modo": "revision", "nota": "La plantilla usa JEFE de Producción Gráfica; ¿corresponde DISEÑADOR GRÁFICO (Área Creativa)?"},
+
+    {"area": "Programación", "rol": "Programador Sr.", "fuente": "sup_agencias", "area_fuente": "ÁREA DE PRODUCCIÓN DIGITAL", "categoria": "JEFE DE PROGRAMACIÓN", "unidad": "mensual", "modo": "auto"},
+    {"area": "Programación", "rol": "Programador/a SSr.", "fuente": "sup_agencias", "area_fuente": "ÁREA DE PRODUCCIÓN DIGITAL", "categoria": "PROGRAMADOR", "unidad": "mensual", "modo": "auto"},
+    {"area": "Programación", "rol": "Progamador Jr.", "fuente": "cpci_honorarios", "categoria": "Programador Aplicaciones Junior", "unidad": "mensual", "modo": "revision", "nota": "Hoy la plantilla le asigna el mismo valor que a SSr.; CPCI tiene una categoría Junior"},
+
+    {"area": "Ai", "rol": "Programador/a Ai", "fuente": "cpci_honorarios", "categoria": "Científico de Datos | IA | ML", "unidad": "mensual", "modo": "revision", "nota": "Propuesta: honorario CPCI para IA/ML. Comparar con las referencias de Coderhouse en Fuentes_Tarifas"}
+  ]
+}

@@ -1,0 +1,66 @@
+name: Actualizar tarifas
+
+on:
+  schedule:
+    - cron: "0 11 * * *" # todos los días a las 08:00 de Argentina (UTC-3)
+  workflow_dispatch:
+    inputs:
+      simulacion:
+        description: "Simulación: calcula todo y no escribe en la planilla"
+        type: boolean
+        default: true
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+  issues: write # para abrir/actualizar el issue "alerta-tarifas"
+
+concurrency:
+  group: actualizar-tarifas
+  cancel-in-progress: false
+
+jobs:
+  pruebas:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements*.txt
+      - name: Dependencias del sistema para el OCR (OpenCV)
+        run: sudo apt-get update -q && sudo apt-get install -y -q libgl1 libglib2.0-0
+      - run: pip install -r requirements-dev.txt
+      - run: python -m tarifas validar-config
+      - run: pytest -q
+
+  actualizar:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    needs: pruebas
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements*.txt
+      - name: Dependencias del sistema para el OCR (OpenCV)
+        run: sudo apt-get update -q && sudo apt-get install -y -q libgl1 libglib2.0-0
+      - run: pip install -r requirements.txt
+      - name: Extraer, conciliar y publicar
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          TARIFAS_SHEET_ID: ${{ secrets.TARIFAS_SHEET_ID }}
+          GITHUB_TOKEN: ${{ github.token }}
+          SIMULACION: ${{ inputs.simulacion }}
+        run: |
+          # Los logs de un repositorio público son públicos: no se muestran montos (sin --mostrar-montos).
+          ARGS=""
+          if [ "$SIMULACION" = "true" ]; then ARGS="--simulacion"; fi
+          python -m tarifas actualizar --salida salida $ARGS

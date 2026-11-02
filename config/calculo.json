@@ -1,0 +1,29 @@
+{
+  "descripcion": "Conversión de la escala de cada fuente al costo diario (columna C de COSTOS X HORAS FACTURABLES) y al costo por hora facturable.",
+  "formula": {
+    "costo_diario": "base_diaria x factor_rol x (1 + cargas_sociales) x factor_multiplicador",
+    "base_diaria": "diario: tal cual | semanal: / dias_laborables_semana | mensual: / dias_laborables_mes | hora: x horas_jornada",
+    "costo_hora_facturable": "costo_diario x (1 + overhead) / horas_jornada  (la planilla aplica esta misma fórmula en la columna S)"
+  },
+  "horas_jornada": 8,
+  "dias_laborables_mes": 21,
+  "dias_laborables_semana": 5,
+  "cargas_sociales": 0.0,
+  "factor_multiplicador": 1.0,
+  "nota_cargas": "Dejar cargas_sociales en 0 mientras el % de overhead de la planilla (Parámetros!B2, rango Factor_Overhead) ya incluya cargas sociales y estructura; si no, se cobrarían dos veces.",
+  "overhead": {
+    "rango_con_nombre": "Factor_Overhead",
+    "valor_si_no_existe": 0.0
+  },
+  "tipo_cambio": {
+    "url": "https://dolarapi.com/v1/dolares/oficial",
+    "campo": "venta",
+    "uso": "Solo para mostrar en pesos las referencias en USD (Coderhouse, Tarifario). No se aplica a la planilla."
+  },
+  "validacion": {
+    "variacion_minima": -0.02,
+    "variacion_maxima": 0.40,
+    "completitud_minima": 0.8,
+    "nota": "Una actualización automática se aplica solo si el nuevo costo diario queda entre -2% y +40% del vigente y la fuente devolvió al menos el 80% de las categorías mapeadas. Si no, queda pendiente de revisión."
+  }
+}

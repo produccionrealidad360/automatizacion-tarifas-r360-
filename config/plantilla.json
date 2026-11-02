@@ -1,0 +1,14 @@
+{
+  "descripcion": "Dónde está cada cosa en el template de Google Sheets. El ID de la planilla NO va acá: se pasa por la variable de entorno TARIFAS_SHEET_ID (secreto de GitHub).",
+  "pestana_costos": "COSTOS X HORAS FACTURABLES",
+  "columna_area": "A",
+  "columna_rol": "B",
+  "columna_costo_diario": "C",
+  "fila_encabezado": 20,
+  "fila_desde": 21,
+  "fila_hasta": 240,
+  "areas_sin_tarifa_salarial": ["Equipamiento", "Viaticos", "Viáticos"],
+  "texto_encabezado": "TOTAL BÁSICO DIARIO\n(actualización automática diaria: ver pestaña Fuentes_Tarifas)",
+  "pestana_trazabilidad": "Fuentes_Tarifas",
+  "escribir_notas": true
+}

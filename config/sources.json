@@ -1,0 +1,138 @@
+{
+  "version": 1,
+  "descripcion": "Fuentes de escalas salariales y honorarios. Para agregar una fuente: copiar un bloque, darle un id único y elegir un extractor existente (ver README).",
+  "fuentes": [
+    {
+      "id": "sica_animacion_2d",
+      "entidad": "SICA-APMA (Sindicato de la Industria Cinematográfica Argentina)",
+      "nombre": "Salarios mínimos Animación 2D",
+      "habilitada": true,
+      "extractor": "sica_pdf",
+      "url": "https://www.sicacine.org.ar/docs/Salarios%20Animaci%C3%B3n%202D%20Octubre%202026.pdf",
+      "descubrimiento": {
+        "pagina": "https://www.sicacine.org.ar/",
+        "texto_enlace": "^Salarios Animaci[oó]n 2D\\b"
+      },
+      "patron_vigencia": "VIGENTES\\s+DESDE\\s+(\\d{2}/\\d{2}/\\d{4})\\s+HASTA\\s+(\\d{2}/\\d{2}/\\d{4})",
+      "moneda": "ARS",
+      "tipo": "escala_sindical"
+    },
+    {
+      "id": "sica_animacion_3d",
+      "entidad": "SICA-APMA (Sindicato de la Industria Cinematográfica Argentina)",
+      "nombre": "Salarios mínimos Animación 3D",
+      "habilitada": true,
+      "extractor": "sica_pdf",
+      "url": "https://www.sicacine.org.ar/docs/Salarios%20Animaci%C3%B3n%203D%20Octubre%202026.pdf",
+      "descubrimiento": {
+        "pagina": "https://www.sicacine.org.ar/",
+        "texto_enlace": "^Salarios Animaci[oó]n 3D\\b"
+      },
+      "patron_vigencia": "VIGENTES\\s+DESDE\\s+(\\d{2}/\\d{2}/\\d{4})\\s+HASTA\\s+(\\d{2}/\\d{2}/\\d{4})",
+      "moneda": "ARS",
+      "tipo": "escala_sindical"
+    },
+    {
+      "id": "sup_agencias",
+      "entidad": "SUP (Sindicato Único de la Publicidad)",
+      "nombre": "Escala Agencias de Publicidad · CCT 57/89 · Dic 2025 a Nov 2026",
+      "habilitada": true,
+      "extractor": "sup_pdf_ocr",
+      "url": "https://www.sup.org.ar/images/2026/02/SALARIOS_ACUERDO_SUP_AGENCIAS_DIC_2025_NOV_2026.pdf",
+      "descubrimiento": null,
+      "opciones": {
+        "resolucion_ocr": 220,
+        "tolerancia_tramo_pesos": 2.0,
+        "tramos_respaldo": [
+          {"desde": "2025-12-01", "porcentaje": 4},
+          {"desde": "2026-02-01", "porcentaje": 8},
+          {"desde": "2026-07-01", "porcentaje": 8},
+          {"desde": "2026-11-01", "porcentaje": 4}
+        ]
+      },
+      "moneda": "ARS",
+      "tipo": "escala_sindical",
+      "nota": "PDF escaneado: se lee con OCR y cada fila se valida contra los aumentos por tramo publicados. Cuando SUP publique el acuerdo siguiente, actualizar la url (y los tramos de respaldo)."
+    },
+    {
+      "id": "cpci_honorarios",
+      "entidad": "CPCI (Consejo Profesional de Ciencias Informáticas de Córdoba)",
+      "nombre": "Honorarios recomendados",
+      "habilitada": true,
+      "extractor": "cpci_html",
+      "url": "https://www.ceni.com.ar/cpcibackoffice/ws/get_honorarios_recomendados_secure_new.php",
+      "pagina_publica": "https://cpcipc.org.ar/honorarios-recomendados/",
+      "ca_adicional": "config/certificados/godaddy_secure_ca_g2.pem",
+      "nota_ca": "www.ceni.com.ar no envía el certificado intermedio de GoDaddy; se agrega solo ese intermedio público (vence en 2031). La verificación TLS sigue activa.",
+      "descubrimiento": {
+        "pagina": "https://cpcipc.org.ar/honorarios-recomendados/",
+        "iframe_contiene": "honorarios_recomendados"
+      },
+      "moneda": "ARS",
+      "tipo": "honorario_recomendado"
+    },
+    {
+      "id": "coderhouse_ai_automation_ar",
+      "entidad": "Coderhouse (Coderlibrary)",
+      "nombre": "¿Cuánto gana un AI Automation Specialist en Argentina?",
+      "habilitada": true,
+      "extractor": "coderhouse_html",
+      "url": "https://www.coderhouse.com/ar/coderlibrary/cuanto-gana-ai-automation-specialist-argentina",
+      "opciones": {
+        "niveles": {
+          "Junior": "Junior\\s*\\(aprox[^)]*\\)\\s*:\\s*mediana orientativa\\s*~?\\s*USD\\s*([\\d.,]+)",
+          "Semi Senior": "Mid\\s*\\(aprox[^)]*\\)\\s*:\\s*mediana orientativa\\s*~?\\s*USD\\s*([\\d.,]+)",
+          "Senior": "Senior\\s*\\(aprox[^)]*\\)\\s*:\\s*mediana orientativa\\s*~?\\s*USD\\s*([\\d.,]+)"
+        },
+        "contexto": "Contractor remoto internacional (HiresLink). La propia fuente aclara que no es el sueldo típico de una pyme local."
+      },
+      "moneda": "USD",
+      "tipo": "referencia_mercado"
+    },
+    {
+      "id": "coderhouse_ai_automation_2025",
+      "entidad": "Coderhouse (Sueldos)",
+      "nombre": "Sueldo de un Especialista en Automatización con IA en Argentina",
+      "habilitada": true,
+      "extractor": "coderhouse_html",
+      "url": "https://www.coderhouse.com/mx/sueldos/sueldo-especialista-automatizacion-ia-argentina-2025",
+      "opciones": {
+        "niveles": {
+          "Junior": "Junior\\s*\\(\\d[^)]*\\)\\s*:?\\s*USD\\s*([\\d.,]+)\\s*[–-]\\s*([\\d.,]+)",
+          "Semi Senior": "Semi\\s*Senior\\s*\\(\\d[^)]*\\)\\s*:?\\s*USD\\s*([\\d.,]+)\\s*[–-]\\s*([\\d.,]+)",
+          "Senior": "(?<!Semi )Senior\\s*\\(\\d[^)]*\\)\\s*:?\\s*USD\\s*([\\d.,]+)\\s*[–-]\\s*([\\d.,]+)"
+        },
+        "contexto": "Mercado local, mensual en USD."
+      },
+      "moneda": "USD",
+      "tipo": "referencia_mercado"
+    },
+    {
+      "id": "tarifario_servicios_3d",
+      "entidad": "Tarifario.ar",
+      "nombre": "Tarifario Digital · Servicios 3D",
+      "habilitada": true,
+      "extractor": "tarifario_js",
+      "url": "https://tarifario.ar/?category=servicios-3d",
+      "opciones": {"categoria": "servicios-3d"},
+      "moneda": "USD",
+      "tipo": "referencia_mercado"
+    },
+    {
+      "id": "sica_publicidad",
+      "entidad": "SICA-APMA (Sindicato de la Industria Cinematográfica Argentina)",
+      "nombre": "Escala salarial Publicidad / VideoClip",
+      "habilitada": false,
+      "extractor": "sica_pdf",
+      "url": "https://www.sicacine.org.ar/docs/Escala%20Salarial%20Publicidad%20Octubre%202026.pdf",
+      "descubrimiento": {
+        "pagina": "https://www.sicacine.org.ar/",
+        "texto_enlace": "^Salarios Publicidad"
+      },
+      "patron_vigencia": "VIGENTES\\s+DESDE\\s+(\\d{2}/\\d{2}/\\d{4})\\s+HASTA\\s+(\\d{2}/\\d{2}/\\d{4})",
+      "moneda": "ARS",
+      "tipo": "escala_sindical",
+      "nota": "Deshabilitada: no estaba en el pedido. Probablemente cubre Rodaje y Sonido; habilitar después de revisar su formato."
+    }
+  ]
+}
