@@ -11,7 +11,8 @@
       "url": "https://www.sicacine.org.ar/docs/Salarios%20Animaci%C3%B3n%202D%20Octubre%202026.pdf",
       "descubrimiento": {
         "pagina": "https://www.sicacine.org.ar/",
-        "texto_enlace": "^Salarios Animaci[oó]n 2D\\b"
+        "texto_enlace": "^Salarios Animaci[oó]n 2D\\b",
+        "patron_url": "https://www.sicacine.org.ar/docs/Salarios%20Animaci%C3%B3n%202D%20{mes}%20{anio}.pdf"
       },
       "patron_vigencia": "VIGENTES\\s+DESDE\\s+(\\d{2}/\\d{2}/\\d{4})\\s+HASTA\\s+(\\d{2}/\\d{2}/\\d{4})",
       "moneda": "ARS",
@@ -26,7 +27,8 @@
       "url": "https://www.sicacine.org.ar/docs/Salarios%20Animaci%C3%B3n%203D%20Octubre%202026.pdf",
       "descubrimiento": {
         "pagina": "https://www.sicacine.org.ar/",
-        "texto_enlace": "^Salarios Animaci[oó]n 3D\\b"
+        "texto_enlace": "^Salarios Animaci[oó]n 3D\\b",
+        "patron_url": "https://www.sicacine.org.ar/docs/Salarios%20Animaci%C3%B3n%203D%20{mes}%20{anio}.pdf"
       },
       "patron_vigencia": "VIGENTES\\s+DESDE\\s+(\\d{2}/\\d{2}/\\d{4})\\s+HASTA\\s+(\\d{2}/\\d{2}/\\d{4})",
       "moneda": "ARS",

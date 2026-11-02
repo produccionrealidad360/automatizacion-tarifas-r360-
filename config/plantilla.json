@@ -8,7 +8,12 @@
   "fila_desde": 21,
   "fila_hasta": 240,
   "areas_sin_tarifa_salarial": ["Equipamiento", "Viaticos", "Viáticos"],
-  "texto_encabezado": "TOTAL BÁSICO DIARIO\n(actualización automática diaria: ver pestaña Fuentes_Tarifas)",
+  "texto_encabezado": "TOTAL BÁSICO DIARIO\n(tarifas vigentes: ver Parámetros › Vigencia de tarifas aplicada)",
   "pestana_trazabilidad": "Fuentes_Tarifas",
-  "escribir_notas": true
+  "escribir_notas": true,
+  "pestana_parametros": "Parámetros",
+  "bloque_version": {
+    "celda_inicio": "A4",
+    "descripcion": "Filas 4 a 8 de Parámetros. Las escribe el job como texto fijo (sin fórmulas), así una copia de presupuesto conserva la versión con la que se emitió."
+  }
 }

@@ -23,7 +23,9 @@ log = logging.getLogger(__name__)
 
 MESES = {"enero": 1, "febrero": 2, "marzo": 3, "abril": 4, "mayo": 5, "junio": 6, "julio": 7,
          "agosto": 8, "septiembre": 9, "setiembre": 9, "octubre": 10, "noviembre": 11, "diciembre": 12}
-TOKEN_MONTO = re.compile(r"^[S$]?\s?\d{1,3}(?:[.,]\d{3})+[.,]\d{2}$")
+# Un monto: miles con separador y 2 decimales. Se buscan DENTRO de cada caja porque, según la versión
+# del motor de OCR, varias celdas pueden venir pegadas en una sola caja ("$1,303,128.64$1,407,378.93").
+MONTO_EN_TEXTO = re.compile(r"[S$]?\d{1,3}(?:[.,]\d{3})+[.,]\d{2}(?!\d)")
 MINIMO_FILAS_VALIDAS = 30
 _MOTOR = None
 
@@ -83,8 +85,14 @@ def parsear_renglones(renglones: list[list[Caja]], tramos: list[dict], toleranci
     validas, invalidas = [], []
     seccion = ""
     for renglon in renglones:
-        valores = [monto(c.texto) for c in renglon if TOKEN_MONTO.match(c.texto.replace(" ", ""))]
-        etiqueta = " ".join(c.texto for c in renglon if not TOKEN_MONTO.match(c.texto.replace(" ", ""))).strip()
+        valores, partes = [], []
+        for c in renglon:
+            compacto = c.texto.replace(" ", "")
+            valores += [monto(m) for m in MONTO_EN_TEXTO.findall(compacto)]
+            resto = MONTO_EN_TEXTO.sub(" ", compacto).strip(" |")
+            if resto:
+                partes.append(c.texto if resto == compacto else resto)
+        etiqueta = " ".join(partes).strip()
         if not valores:
             if clave(etiqueta).startswith("area"):
                 seccion = etiqueta

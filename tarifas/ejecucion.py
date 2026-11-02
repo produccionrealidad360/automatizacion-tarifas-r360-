@@ -35,7 +35,33 @@ def abrir_hoja(opciones, cfg: config.Configuracion):
     sheet_id = os.environ.get("TARIFAS_SHEET_ID", "").strip()
     if not sheet_id:
         raise RuntimeError("Falta la variable TARIFAS_SHEET_ID con el ID de la planilla")
-    return HojaGoogle(cfg.plantilla, sheet_id, credenciales_desde_entorno())
+    credenciales = credenciales_desde_entorno()
+    try:
+        return HojaGoogle(cfg.plantilla, sheet_id, credenciales)
+    except Exception as exc:
+        raise RuntimeError(explicar_error_planilla(exc, credenciales.get("client_email", ""))) from exc
+
+
+def explicar_error_planilla(exc: Exception, email: str) -> str:
+    """Traduce el error de Google a la acción concreta. No incluye montos ni el ID de la planilla."""
+    import gspread
+
+    causa = exc.__cause__ or exc
+    detalle = ""
+    respuesta = getattr(causa, "response", None)
+    if respuesta is not None:
+        detalle = getattr(respuesta, "text", "") or ""
+    cuenta = email.split("@")[0] + "@…iam.gserviceaccount.com" if email else "la cuenta de servicio"
+    if "SERVICE_DISABLED" in detalle or "has not been used" in detalle or "is disabled" in detalle:
+        return ("La API de Google Sheets no está habilitada en el proyecto de Google Cloud de la cuenta de servicio: "
+                "console.cloud.google.com > APIs y servicios > Biblioteca > Google Sheets API > Habilitar")
+    if isinstance(exc, gspread.exceptions.SpreadsheetNotFound):
+        return (f"No existe una planilla con ese TARIFAS_SHEET_ID visible para {cuenta}: revisar que el ID "
+                "sea la parte de la URL entre /d/ y /edit, y que la planilla esté compartida con esa cuenta")
+    if isinstance(exc, PermissionError) or "PERMISSION_DENIED" in detalle:
+        return (f"{cuenta} no tiene acceso a la planilla: abrirla, Compartir, y agregar el e-mail completo de la "
+                "cuenta de servicio (client_email del JSON) como Editor")
+    return f"{exc.__class__.__name__}: {exc}"
 
 
 def actualizar(opciones) -> int:
@@ -65,7 +91,9 @@ def actualizar(opciones) -> int:
     traza = publicar.construir_trazabilidad(propuestas, resultados, usados, cfg.calculo, tc, opciones.simulacion)
     aplicadas = 0
     if any(r.ok for r in resultados):
-        aplicadas = publicar.publicar(hoja, propuestas, traza, cfg.plantilla, opciones.simulacion)
+        maestro = os.environ.get("TARIFAS_SHEET_ID", "").strip() if opciones.backend == "google" else "(archivo local de prueba)"
+        aplicadas = publicar.publicar(hoja, propuestas, traza, cfg.plantilla, opciones.simulacion, resultados,
+                                      ctx.ahora.strftime("%d/%m/%Y %H:%M (ART)"), maestro)
 
     res = alertas.resumen(propuestas, resultados, aplicadas, opciones.simulacion)
     log.info("Resultado: %s", ", ".join(f"{k}={v}" for k, v in sorted(res["estados"].items())))

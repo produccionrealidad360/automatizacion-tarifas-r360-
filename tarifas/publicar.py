@@ -7,6 +7,8 @@
 """
 from __future__ import annotations
 
+import re
+
 from .calculo import hora_facturable
 from .modelos import Propuesta, ResultadoFuente
 from .normalizar import formato_ars
@@ -103,7 +105,46 @@ def construir_trazabilidad(propuestas: list[Propuesta], resultados: list[Resulta
     return [fila_propuesta(p, simulacion) for p in ordenadas] + filas_catalogo(resultados, usados, calc, tipo_cambio)
 
 
-def publicar(hoja, propuestas: list[Propuesta], trazabilidad: list[list], plantilla: dict, simulacion: bool) -> int:
+def etiqueta_fuente(res: ResultadoFuente) -> str:
+    return f"{res.entidad.split(' (')[0]} · {res.nombre}"
+
+
+def armar_vigencia(propuestas: list[Propuesta], resultados: list[ResultadoFuente], anterior: str | None) -> str:
+    """Una línea por fuente cuyas tarifas están cargadas: 'SICA-APMA · Salarios mínimos Animación 2D: 01/10/2026 a 30/11/2026'.
+
+    Si una fuente falló en esta corrida, se conserva su línea anterior: sus tarifas siguen cargadas.
+    """
+    previas = {}
+    for linea in str(anterior or "").splitlines():
+        if ": " in linea:
+            clave_linea, valor = linea.split(": ", 1)
+            previas[clave_linea.strip()] = valor.strip()
+    en_uso = {p.fuente_id for p in propuestas if p.estado in ("aplicar", "sin_cambios")}
+    lineas = {}
+    for res in resultados:
+        nombre = etiqueta_fuente(res)
+        if res.ok and res.fuente_id in en_uso:
+            lineas[nombre] = res.periodo or "sin dato de vigencia"
+        elif not res.ok and nombre in previas:
+            lineas[nombre] = previas[nombre]
+    return "\n".join(f"{k}: {v}" for k, v in lineas.items())
+
+
+def bloque_version(fecha_version: str, vigencia: str, ahora: str, maestro: str) -> list[list]:
+    return [
+        ["Versión de tarifas", "", "Lo completa la actualización automática del Template Maestro. En una copia de "
+                                   "presupuesto estos datos quedan fijos y muestran con qué tarifas se armó."],
+        ["Fecha de versión de plantilla", fecha_version, "Última vez que la actualización automática cambió alguna tarifa."],
+        ["Vigencia de tarifas aplicada", vigencia, "Período de cada escala o tarifario cargado en COSTOS X HORAS FACTURABLES."],
+        ["Última verificación automática", ahora, "Última ejecución sobre el Template Maestro. En una copia esta fecha "
+                                                  "queda vieja: es normal, las copias no se actualizan."],
+        ["ID del Template Maestro", maestro, "Si la URL de este archivo no contiene este ID, es una copia: sus tarifas "
+                                             "no cambian solas."],
+    ]
+
+
+def publicar(hoja, propuestas: list[Propuesta], trazabilidad: list[list], plantilla: dict, simulacion: bool,
+             resultados: list[ResultadoFuente] | None = None, ahora: str = "", maestro: str = "") -> int:
     """Escribe en la planilla. En simulación no escribe nada. Devuelve la cantidad de costos aplicados."""
     a_aplicar = [p for p in propuestas if p.estado == "aplicar" and p.fila and p.valor_nuevo is not None]
     if simulacion:
@@ -113,6 +154,17 @@ def publicar(hoja, propuestas: list[Propuesta], trazabilidad: list[list], planti
         hoja.escribir_texto(f"{plantilla['columna_costo_diario']}{plantilla['fila_encabezado']}",
                             plantilla["texto_encabezado"])
     hoja.escribir_trazabilidad(ENCABEZADOS, trazabilidad)
+    if plantilla.get("pestana_parametros") and plantilla.get("bloque_version"):
+        pestana = plantilla["pestana_parametros"]
+        inicio = plantilla["bloque_version"]["celda_inicio"]
+        col, fila = re.match(r"([A-Z]+)(\d+)", inicio).groups()
+        col_valor = chr(ord(col) + 1)
+        previo = hoja.leer_rango(pestana, f"{col_valor}{int(fila) + 1}:{col_valor}{int(fila) + 2}")
+        fecha_previa = previo[0][0] if previo and previo[0] else None
+        vigencia_previa = previo[1][0] if len(previo) > 1 and previo[1] else None
+        fecha_version = ahora if (a_aplicar or not fecha_previa) else str(fecha_previa)
+        vigencia = armar_vigencia(propuestas, resultados or [], vigencia_previa)
+        hoja.escribir_rango(pestana, inicio, bloque_version(fecha_version, vigencia, ahora, maestro))
     hoja.guardar()
     return len(a_aplicar)
 

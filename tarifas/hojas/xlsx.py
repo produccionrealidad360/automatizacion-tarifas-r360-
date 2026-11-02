@@ -80,6 +80,27 @@ class HojaXlsx(HojaDeCalculo):
             ws.append(fila)
         ws.freeze_panes = "A2"
 
+    def leer_rango(self, pestana: str, rango: str) -> list[list]:
+        if pestana not in self.wb.sheetnames:
+            return []
+        hoja = self.wb[pestana]  # el bloque de versión es texto fijo: no hace falta el libro de valores
+        celdas = hoja[rango]
+        if not isinstance(celdas, tuple):
+            celdas = ((celdas,),)
+        elif celdas and not isinstance(celdas[0], tuple):
+            celdas = (celdas,)
+        return [[c.value for c in fila] for fila in celdas]
+
+    def escribir_rango(self, pestana: str, celda_inicio: str, valores: list[list]) -> None:
+        from openpyxl.utils.cell import coordinate_from_string, column_index_from_string
+
+        hoja = self.wb[pestana] if pestana in self.wb.sheetnames else self.wb.create_sheet(pestana)
+        col, fila = coordinate_from_string(celda_inicio)
+        c0 = column_index_from_string(col)
+        for i, valores_fila in enumerate(valores):
+            for j, v in enumerate(valores_fila):
+                hoja.cell(fila + i, c0 + j).value = v
+
     def guardar(self) -> None:
         self.salida.parent.mkdir(parents=True, exist_ok=True)
         self.wb.save(self.salida)

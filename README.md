@@ -29,8 +29,9 @@ Controles de calidad de cada extractor:
 - **Todas**: un mínimo de filas leídas. Si no se llega, la fuente se marca con error y **no se toca la planilla** con sus datos.
 
 **Descubrimiento automático**: SICA publica un PDF nuevo por período. El extractor busca en
-`https://www.sicacine.org.ar/` el enlace "Salarios Animación 2D …" y usa el más nuevo. Si no lo encuentra,
-usa la URL de `sources.json`. Si una URL falla, prueba con la otra y, si las dos fallan, registra el error y
+`https://www.sicacine.org.ar/` el enlace "Salarios Animación 2D …" y usa el más nuevo. Esa página bloquea a
+los servidores de GitHub, así que además prueba el nombre del archivo por mes ("…Diciembre 2026.pdf",
+"…Noviembre 2026.pdf", etc., desde el mes próximo hacia atrás). Si no encuentra nada, usa la URL de `sources.json`. Si una URL falla, prueba con la otra y, si las dos fallan, registra el error y
 sigue con las demás fuentes.
 
 ## Fórmula (configurable en `config/calculo.json`)
@@ -68,11 +69,73 @@ ejecución siguiente se aplica, siempre que el valor propuesto no haya cambiado.
   propuesto, variación, hora facturable, fuente, documento, URL, período de vigencia, cálculo, estado y motivo.
   Además lista **todo lo extraído de cada fuente con su área**: es el "listado por área" de cada sindicato,
   e incluye las categorías que todavía no están mapeadas y las referencias de mercado convertidas a pesos.
-- El encabezado de la columna C indica que el valor se actualiza solo.
+- **Bloque de versión en `Parámetros` (filas 4 a 8)**, a la vista de quien use la planilla:
+
+  | Campo | Qué muestra |
+  |---|---|
+  | Fecha de versión de plantilla | Última vez que la actualización cambió alguna tarifa |
+  | Vigencia de tarifas aplicada | Una línea por fuente cargada, con su período (p. ej. `SICA-APMA · Salarios mínimos Animación 2D: 01/10/2026 a 30/11/2026`) |
+  | Última verificación automática | Última ejecución del job sobre el Template Maestro |
+  | ID del Template Maestro | Para saber si el archivo abierto es el maestro o una copia |
+
+  Se escriben como **texto fijo** (sin fórmulas como `HOY()`), así una copia conserva la versión con la que se
+  emitió el presupuesto. Si una fuente falla un día, se mantiene su línea anterior: sus tarifas siguen cargadas.
+- El encabezado de la columna C remite a *Parámetros › Vigencia de tarifas aplicada*.
 
 > La pestaña `LISTADO DE ÁREAS` **no se modifica automáticamente**: sus nombres son las claves de los
 > menús desplegables y de las búsquedas, y renombrarlos rompería presupuestos ya cargados. Las categorías
 > nuevas aparecen en `Fuentes_Tarifas` como "Categoría sin mapear" para incorporarlas a mano.
+
+## Template Maestro y copias de presupuesto
+
+La planilla que actualiza el job (la de `TARIFAS_SHEET_ID`) es el **Template Maestro**: el origen de verdad
+de las tarifas. Cada presupuesto se arma en una **copia**, y las copias nunca se actualizan:
+
+- El job escribe **solo** en el archivo cuyo ID está en `TARIFAS_SHEET_ID`. Una copia tiene otro ID, así que
+  GitHub Actions no la toca nunca, aunque la cuenta de servicio tuviera acceso.
+- Los costos de la columna C y el bloque de versión son valores fijos: al copiar, quedan congelados en la
+  fecha de la copia.
+
+### Crear un presupuesto
+1. Abrir el enlace de copia del maestro: `https://docs.google.com/spreadsheets/d/<ID_DEL_MAESTRO>/copy`
+   (el ID no se publica en este repositorio: pedirlo a administración). Ese enlace muestra el botón
+   **Hacer una copia**. Funciona aunque el maestro esté compartido solo como lector.
+   En una cuenta de Google Workspace también se puede publicar el maestro en la *Galería de plantillas*
+   de Hojas de cálculo.
+2. En el diálogo de copia, **no marcar** "Compartirlo con las mismas personas".
+3. Renombrar la copia con el formato `PRESUPUESTO <Cliente> <AAAA-MM-DD>` y moverla a la carpeta del cliente.
+4. Revisar en `Parámetros` la **Fecha de versión** y la **Vigencia de tarifas aplicada**. Si la vigencia está
+   vencida, avisar antes de cotizar.
+5. Cargar los recursos en `V COSTOS`, el **dólar del día de envío en H2** y la fecha de envío en G2.
+
+### Congelar un presupuesto entregado
+1. En `V COSTOS`, reemplazar F2 y S2 por su valor: copiar y pegar solo valores (`Ctrl+Shift+V`). Son los dos
+   únicos valores que se actualizan solos (IMPORTXML del BNA y del dólar blue). Los cálculos usan H2 y X2,
+   que se cargan a mano, pero conviene que la copia no cambie nada después de enviada.
+2. *Archivo › Historial de versiones › Asignar nombre a la versión actual*: `Enviado al cliente AAAA-MM-DD`.
+3. *Archivo › Descargar › PDF* de la pestaña `V PRESUPUESTO`, y guardarlo junto a la planilla.
+4. *Datos › Proteger hojas e intervalos* (o dejar a los demás como lectores) para evitar cambios por error.
+5. Al aprobarse: completar la fecha de aprobación y el **dólar blue del día en X2**, a mano.
+6. Si el cliente pide re-cotizar con tarifas nuevas, hacer **una copia nueva del maestro**. No pegar tarifas
+   nuevas en una copia vieja.
+
+### Qué hay que saber al copiar
+Se revisó en la planilla y en la copia que se hizo el 30/10/2026:
+
+| Elemento | Al copiar | Riesgo |
+|---|---|---|
+| Rangos con nombre (`Factor_Overhead` y las 18 listas de áreas) | Se copian y apuntan a las pestañas de la copia | Ninguno. El overhead de una copia queda fijo en su `Parámetros!B2` |
+| Menús desplegables (`INDIRECT` sobre rangos con nombre y `Helper_Dropdowns`) | Siguen funcionando en la copia | Ninguno |
+| IDs de pestañas (gid) | Se mantienen | Ninguno. `Helper_Dropdowns!A1` tiene un gid escrito, pero es texto que no actúa |
+| IMPORTXML (V COSTOS F2 y S2) | La copia pide **Permitir acceso** y sigue actualizándose | Bajo: son informativos. Congelarlos al enviar (paso 1) |
+| `HOY()`, `AHORA()`, `IMPORTRANGE` o vínculos a otros archivos | No hay en la plantilla | Ninguno |
+| Apps Script vinculado | Se copia; los activadores no se copian | Ninguno: el script actual no tiene activadores y no hay que ejecutarlo |
+| Pestaña `Fuentes_Tarifas` | Se copia como foto del día | La casilla *Aprobar* no hace nada en una copia: solo se lee en el maestro |
+| Copiar mientras corre el job (08:00 a 08:10 ART) | La copia puede tomar una actualización a medias | Bajo: evitar copiar en ese horario |
+
+**En el maestro no se arman presupuestos.** `V COSTOS` del maestro tiene que quedar sin recursos cargados,
+porque todo lo que tenga se copia a cada presupuesto nuevo. Solo administración tiene que poder editar el
+maestro, junto con la cuenta de servicio. El resto del equipo, como lector, puede igual usar el enlace `/copy`.
 
 ## Configuración
 
@@ -148,6 +211,16 @@ Verificado el 02/11/2026 en la [página oficial de límites de la API de Sheets]
 - Si hay fuentes con error, pendientes o roles no encontrados, se abre (o se actualiza) un **issue** con la
   etiqueta `alerta-tarifas`. Cuando todo vuelve a estar en orden, se cierra solo.
 - Los avisos de cada fuente (URL nueva detectada, escala vencida, filas descartadas) quedan en el log.
+
+## Solución de problemas
+
+| Mensaje en el log de la corrida | Qué hacer |
+|---|---|
+| `… no tiene acceso a la planilla` (antes: `PermissionError`) | Abrir el maestro, *Compartir*, agregar el `client_email` del JSON de la cuenta de servicio como **Editor** |
+| `La API de Google Sheets no está habilitada…` | console.cloud.google.com › APIs y servicios › Biblioteca › Google Sheets API › Habilitar |
+| `No existe una planilla con ese TARIFAS_SHEET_ID…` | Revisar el secreto: es la parte de la URL entre `/d/` y `/edit` |
+| `Faltan las credenciales…` / `Falta la variable TARIFAS_SHEET_ID` | Cargar los dos secretos en *Settings › Secrets and variables › Actions* |
+| `No se pudo leer la página índice … (HTTP 403)` | Normal desde GitHub en sicacine.org.ar: se usa el patrón de nombre o la URL fija |
 
 ## Seguridad
 - **El repositorio es público**: los logs de GitHub Actions y los issues son visibles para cualquiera. Por

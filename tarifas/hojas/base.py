@@ -79,5 +79,13 @@ class HojaDeCalculo(ABC):
     def escribir_trazabilidad(self, encabezados: list[str], filas: list[list]) -> None:
         ...
 
+    @abstractmethod
+    def leer_rango(self, pestana: str, rango: str) -> list[list]:
+        """Valores sin formato de un rango de otra pestaña ([] si la pestaña no existe)."""
+
+    @abstractmethod
+    def escribir_rango(self, pestana: str, celda_inicio: str, valores: list[list]) -> None:
+        """Escribe valores tal cual (sin interpretar fórmulas). Crea la pestaña si no existe."""
+
     def guardar(self) -> None:
         """Los backends que escriben en lote (xlsx) guardan acá. Google escribe en el momento."""

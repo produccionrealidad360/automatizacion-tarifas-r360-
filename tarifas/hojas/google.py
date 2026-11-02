@@ -92,6 +92,20 @@ class HojaGoogle(HojaDeCalculo):
     def escribir_texto(self, celda: str, texto: str) -> None:
         self.ws.update(values=[[texto]], range_name=celda, value_input_option=ValueInputOption.raw)
 
+    def leer_rango(self, pestana: str, rango: str) -> list[list]:
+        try:
+            ws = self.sh.worksheet(pestana)
+        except gspread.exceptions.WorksheetNotFound:
+            return []
+        return list(ws.get(rango, value_render_option=ValueRenderOption.unformatted))
+
+    def escribir_rango(self, pestana: str, celda_inicio: str, valores: list[list]) -> None:
+        try:
+            ws = self.sh.worksheet(pestana)
+        except gspread.exceptions.WorksheetNotFound:
+            ws = self.sh.add_worksheet(title=pestana, rows=50, cols=10)
+        ws.update(values=valores, range_name=celda_inicio, value_input_option=ValueInputOption.raw)
+
     def escribir_trazabilidad(self, encabezados, filas):
         total_filas, total_cols = len(filas) + 1, len(encabezados)
         ws = self._hoja_trazabilidad(crear=True, filas=total_filas + 20, columnas=total_cols)

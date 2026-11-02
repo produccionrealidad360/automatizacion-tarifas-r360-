@@ -47,7 +47,7 @@ def _resultado_vacio(fuente: dict, url: str, ctx: Contexto) -> ResultadoFuente:
 def ejecutar_fuente(fuente: dict, cliente, ctx: Contexto) -> ResultadoFuente:
     extractor = REGISTRO[fuente["extractor"]]
     url_config = fuente["url"]
-    url_descubierta, aviso = descubrir(fuente, cliente)
+    url_descubierta, aviso = descubrir(fuente, cliente, ctx.hoy)
     avisos = [aviso] if aviso else []
     candidatas = []
     if url_descubierta and url_descubierta != url_config:
