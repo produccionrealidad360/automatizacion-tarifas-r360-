@@ -98,7 +98,8 @@ Hay un ejemplo deshabilitado (`sica_publicidad`) que probablemente cubre Rodaje 
 
 ### 1. Cuenta de servicio de Google (una sola vez)
 1. En [console.cloud.google.com](https://console.cloud.google.com) crear un proyecto y habilitar la
-   **Google Sheets API**.
+   **Google Sheets API**. **No vincular una cuenta de facturación ni activar la prueba de US$300**:
+   no hacen falta (ver [Costos](#costos)).
 2. En *IAM y administración › Cuentas de servicio*, crear una cuenta (por ejemplo `tarifas-r360`) y
    generar una **clave JSON**. Guardarla fuera del repositorio.
 3. Abrir la planilla, **Compartir** y agregar el e-mail de la cuenta de servicio
@@ -125,6 +126,22 @@ python -m tarifas actualizar --backend xlsx --xlsx-entrada plantilla.xlsx --xlsx
 GOOGLE_APPLICATION_CREDENTIALS=clave.json TARIFAS_SHEET_ID=... python -m tarifas actualizar --simulacion
 pytest
 ```
+
+## Costos
+
+Verificado el 02/11/2026 en la [página oficial de límites de la API de Sheets](https://developers.google.com/workspace/sheets/api/limits?hl=es-419):
+
+- **API de Google Sheets: sin costo.** "Todo uso estándar de la API de Google Sheets está disponible sin costo
+  adicional." El límite es de 60 lecturas y 60 escrituras por minuto por usuario (la cuenta de servicio cuenta
+  como un usuario). Cada corrida diaria hace unas 15 solicitudes.
+- **No hace falta cuenta de facturación** ni la prueba de US$300 de Google Cloud: crear el proyecto, habilitar
+  la API y crear la cuenta de servicio funciona sin facturación. Sin una cuenta de facturación vinculada,
+  Google no puede cobrar nada: si alguna vez se superara el límite, la solicitud se rechaza (error 429) y la
+  corrida siguiente vuelve a intentar.
+- Google anunció que, más adelante en 2026, superar las cuotas se cobrará en la cuenta de facturación. Con el
+  volumen de este job no aplica, y sin facturación vinculada tampoco puede generar cargos.
+- **GitHub Actions**: gratis en repositorios públicos. En uno privado, el plan gratuito incluye 2.000 minutos
+  por mes y cada corrida usa unos 2 o 3 minutos (entre 60 y 90 por mes).
 
 ## Alertas
 - Cada corrida publica un **resumen** en la pestaña *Summary* de GitHub Actions.
